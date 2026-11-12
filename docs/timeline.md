@@ -85,6 +85,13 @@ The initial implementation will use a simulated 2D map. Live OpenStreetMap integ
 - `update-flight-status`: Checks and updates the current simulation condition.
 - `start-simulator`: Initializes and launches the interactive simulation using `big-bang`.
 
+### 1.7 add render cloud.
+
+**purpose:** make cloud render at the cock pit to make it look better
+** main function **
+- render clouds
+- render sky
+
 ---
 
 ## 2. Development Timeline
