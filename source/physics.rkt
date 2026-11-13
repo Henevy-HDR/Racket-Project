@@ -1,16 +1,17 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname physics) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
-#| Lorenzo Felix
-Carlo A. Furia
-Programming foundamentals
-12.11.2026
-physics.rkt
-|#
+; Filename: physics.rkt
+; Date: 12 Nov
+; Author: Lorenzo Felix
+; Purpose: contains the aircraft's physics calculations and updates
+;          its state based on physical forces and elapsed time.
+; TODO: validate the physics model and test its integration.
 
-#lang htdp/isl+
 (require math)
 (require sludges)
+
+(require "model.rkt")
 
 #|
 FLIGHT SIMULATOR: PHYSICS ENGINE
@@ -35,7 +36,9 @@ rendering, maps, destinations, collisions, or the event loop.
 |#
 
 
+
 ; 1. PHYSICAL CONSTANTS
+; Based on beginner-friendly B2 spirit
 
 (define GRAVITY 9.80665)
 ;; GRAVITY : Number
@@ -88,14 +91,13 @@ rendering, maps, destinations, collisions, or the event loop.
 
 ; 2. AIRCRAFT DATA
 
-(define-type Throttle (number-from-to 0 1))
-;; A Throttle is a Number in [0, 1].
+; Defined by indexpower
+;; A Throttle is a Number in [0, 100].
 
 (define-type Airspeed (number-from 0))
 ;; An Airspeed is a non-negative Number in m/s.
 
-(define-struct aircraft
-  (position altitude airspeed heading pitch roll vspeed throttle))
+;; MEMO: 
 ;; An Aircraft is a
 ;; (make-aircraft Posn Number Airspeed Number Number Number Number Throttle).
 ;; position: local X (east) and Y (north), measured in metres.
@@ -109,7 +111,7 @@ rendering, maps, destinations, collisions, or the event loop.
 ;; Airspeed must be at least the absolute value of vspeed.
 
 (define INITIAL-AIRCRAFT
-  (make-aircraft (make-posn 0 0) 1000 140 0 0 0 0 0.5))
+  (make-aircraft (make-posn 0 0) 1000 140 0 0 0 0 50))
 ;; INITIAL-AIRCRAFT : Aircraft
 ;; Example airborne aircraft for tests and integration.
 
@@ -117,7 +119,6 @@ rendering, maps, destinations, collisions, or the event loop.
 ; 3. FORCE CALCULATIONS
 
 ; a. Thrust Calculations
-
 (: calculate-thrust (Throttle -> Number))
 ;; Computes engine thrust from throttle position (0 to 1).
 
@@ -126,11 +127,11 @@ rendering, maps, destinations, collisions, or the event loop.
   (...throttle...MAX-THRUST...))
 
 (define (calculate-thrust throttle)
-  (* MAX-THRUST throttle))
+  (* MAX-THRUST (/ throttle 100)))
 
 (check-within (calculate-thrust 0) 0 0.001)
-(check-within (calculate-thrust 0.5) (/ MAX-THRUST 2) 0.001)
-(check-within (calculate-thrust 1) MAX-THRUST 0.001)
+(check-within (calculate-thrust 50) (/ MAX-THRUST 2) 0.001)
+(check-within (calculate-thrust 100) MAX-THRUST 0.001)
 
 ; b. Drag Calculations
 
@@ -578,27 +579,14 @@ rendering, maps, destinations, collisions, or the event loop.
 (check-expect
  (> (aircraft-heading
      (step-aircraft
-      (make-aircraft (make-posn 0 0) 1000 140 0 0 20 0 0.5) 0.1)) 0)
+      (make-aircraft (make-posn 0 0) 1000 140 0 0 20 0 50) 0.1)) 0)
  #true)
 
 
 ; 6. MODULE EXPORTS
 
-;; Only the Aircraft interface and its physics update are
-;; needed by the main simulation and control modules.
 
-(provide Aircraft)
-(provide Throttle)
-(provide Airspeed)
-(provide make-aircraft)
-(provide aircraft?)
-(provide aircraft-position)
-(provide aircraft-altitude)
-(provide aircraft-airspeed)
-(provide aircraft-heading)
-(provide aircraft-pitch)
-(provide aircraft-roll)
-(provide aircraft-vspeed)
-(provide aircraft-throttle)
+; 6. MODULE EXPORTS
+
 (provide INITIAL-AIRCRAFT)
 (provide step-aircraft)

@@ -4,5 +4,6 @@
 ; Filename: main.rkt
 ; Date: 12 Nov
 ; Author: Chad John Pete
-; Purpose: requires render.rkt (graphics) and model.rkt (logic)
-;          and runs the program using big-bang.
+; Purpose: contains the main program logic, manages the world state,
+;          and coordinates the physics engine with the simulation.
+; TODO: implement event handlers, world updates, and integration.

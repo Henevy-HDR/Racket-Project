@@ -1,0 +1,119 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname test) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #t ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
+
+#lang htdp/isl+
+
+(require sludges)
+(require "data.rkt")
+(require "physics.rkt")
+
+; Filename: physics-test.rkt
+; Date: 12 Nov
+; Author: Chad John Pete
+; Purpose: tests aircraft physics by simulating multiple ticks
+;          and verifying the resulting aircraft state.
+
+
+; 1. TEST CONFIGURATION
+
+(define TICK-DT (/ 1 30))
+;; Each simulation tick represents 1/30 of a second.
+
+(define TEST-AIRCRAFT
+  (make-aircraft
+   (make-posn 0 0) ; Position
+   1000            ; Altitude (m)
+   140             ; Airspeed (m/s)
+   0               ; Heading (degrees)
+   0               ; Pitch (degrees)
+   0               ; Roll (degrees)
+   0               ; Vertical speed (m/s)
+   1))             ; Throttle (0 to 1)
+
+
+; 2. TICK SIMULATION
+
+(: simulate-ticks (Aircraft Integer Number -> Aircraft))
+;; Simulates the aircraft's motion over a specified number
+;; of ticks, returning its final state.
+
+(define-header (simulate-ticks TEST-AIRCRAFT 0 TICK-DT)
+  TEST-AIRCRAFT)
+
+(define-template (simulate-ticks aircraft ticks dt)
+  (if (= ticks 0)
+      aircraft
+      (... (simulate-ticks ... (sub1 ticks) dt))))
+
+;; Terminates because ticks decreases by 1 until reaching 0.
+;; Assumes ticks is a non-negative integer.
+
+(define (simulate-ticks aircraft ticks dt)
+  (if (= ticks 0)
+      aircraft
+      (simulate-ticks
+       (step-aircraft aircraft dt)
+       (sub1 ticks)
+       dt)))
+
+
+; 3. TEST SCENARIOS
+
+(define AFTER-0
+  (simulate-ticks TEST-AIRCRAFT 0 TICK-DT))
+
+(define AFTER-1
+  (simulate-ticks TEST-AIRCRAFT 1 TICK-DT))
+
+(define AFTER-30
+  (simulate-ticks TEST-AIRCRAFT 30 TICK-DT))
+
+(define AFTER-300
+  (simulate-ticks TEST-AIRCRAFT 300 TICK-DT))
+
+
+; 4. PHYSICS TESTS
+
+; a. Initial State
+
+(check-expect AFTER-0 TEST-AIRCRAFT)
+
+; b. Time Progression
+
+(check-expect
+ (simulate-ticks TEST-AIRCRAFT 1 TICK-DT)
+ (step-aircraft TEST-AIRCRAFT TICK-DT))
+
+; c. Airspeed
+
+(check-expect
+ (> (aircraft-airspeed AFTER-30) 140)
+ #true)
+
+; d. Position
+
+(check-expect
+ (> (posn-y (aircraft-position AFTER-30)) 0)
+ #true)
+
+; e. Controls Remain Unchanged
+
+(check-expect (aircraft-pitch AFTER-30) 0)
+(check-expect (aircraft-roll AFTER-30) 0)
+(check-expect (aircraft-throttle AFTER-30) 1)
+
+; f. Heading Remains Stable Without Roll
+
+(check-within (aircraft-heading AFTER-30)
+              0
+              0.001)
+
+
+; 5. SIMULATION RESULTS
+
+;; Display the aircraft after one second.
+AFTER-30
+
+;; Display the aircraft after ten seconds.
+AFTER-300
