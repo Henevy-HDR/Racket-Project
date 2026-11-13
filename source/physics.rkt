@@ -2,7 +2,7 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname physics) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ; Filename: physics.rkt
-; Date: 12 Nov
+; Date: 12 Nov 2026
 ; Author: Lorenzo Felix
 ; Purpose: contains the aircraft's physics calculations and updates
 ;          its state based on physical forces and elapsed time.
@@ -31,8 +31,7 @@ Pitch, roll, and throttle remain as supplied by the caller. Distances are
 measured in metres, speeds in m/s, throttle ranges from 0 to 1, and aircraft
 angles are expressed in degrees (converted to radians for trigonometry).
 
-This module performs only physics calculations. It does not handle controls,
-rendering, maps, destinations, collisions, or the event loop.
+This module performs ONLY physics calculations -- it should stay this way btw.
 |#
 
 
