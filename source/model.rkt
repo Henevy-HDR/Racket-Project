@@ -11,7 +11,12 @@
 (require sludges)
 
 ;; Use built-in Posn as Position (or define your own struct with typed fields)
-(define-type Position Posn)
+(define-struct Position
+  ([x Number]
+   [y Number]
+   [heading Degree]))
+
+(define-struct degree-coordinate [(x Degree) (y Degree)])
 
 (define-type Degree (number-from-<to 0 360))
 
@@ -56,3 +61,8 @@
 (provide aircraft-airspeed aircraft-heading)
 (provide aircraft-pitch aircraft-roll) 
 (provide aircraft-vspeed aircraft-throttle)
+(provide DegreeCoordinate
+         make-degree-coordinate
+         degree-coordinate?
+         degree-coordinate-x
+         degree-coordinate-y)

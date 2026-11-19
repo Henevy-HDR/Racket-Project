@@ -1,9 +1,13 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname main) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname main) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ; Filename: main.rkt
 ; Date: 12 Nov
 ; Author: Chad John Pete
 ; Purpose: contains the main program logic, manages the world state,
 ;          and coordinates the physics engine with the simulation.
 ; TODO: implement event handlers, world updates, and integration.
+
+(require "model.rkt")
+
+(define INITIAL_POSITION (make-degree-coordinate 0 0))
