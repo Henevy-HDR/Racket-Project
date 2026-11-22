@@ -1,0 +1,16 @@
+# Racket compiled bytecode and build directories
+compiled/
+*.zo
+*.dep
+
+# DrRacket backup and autosave files
+*.rkt~
+*.bak
+.#*
+
+# Logs
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
