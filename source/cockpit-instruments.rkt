@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname cockpit-instruments) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |Cockpit instruments|) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ; Filename: cockpit-instruments.rkt
 ; Date: 12 Nov
@@ -10,25 +10,37 @@
 ;TO DO: update the wheel.
 
 
+
+
 (require 2htdp/universe)
 (require 2htdp/image)
+(require sludges)
+
+;; All inputs and outputs below use built-in Number, String and Image types.
+;; No additional data types or recursive functions are introduced here.
+;; Modified state variables: none. Every function returns a value without
+;; changing its inputs or the shared artwork constants.
 
 ;; display-number : Number -> String
+(: display-number (Number -> String))
 ;; Rounds only the displayed text, preserving precision for needle movement.
 (define (display-number value)
   (number->string (inexact->exact (round value))))
 
 ;; limit-to : Number Number Number -> Number
+(: limit-to (Number Number Number -> Number))
 ;; Limits a needle to the visible scale without changing its numeric readout.
+;; Assumes low <= high.
 (define (limit-to low high value)
   (max low (min high value)))
 
 ;; heading-text : Number -> String
+(: heading-text (Number -> String))
 ;; Displays a rounded heading as three digits, wrapping 360 back to 000.
 (define (heading-text heading)
   (local [(define degrees (modulo (inexact->exact (round heading)) 360))
           (define digits (number->string degrees))]
-    (string-append (cond [( degrees 10) "00"]
+    (string-append (cond [(< degrees 10) "00"]
                          [(< degrees 100) "0"]
                          [else ""])
                    digits "°")))
@@ -244,6 +256,7 @@
    throttle-canvas))
 
 ;; render-throttle : Number -> Image
+(: render-throttle (Number -> Image))
 ;; Draws engine power in percent; the handle follows the labelled ticks.
 (define (render-throttle percentage)
   (place-images (list throttle-handle
@@ -356,7 +369,8 @@
          (make-posn 71 133))  ;readout
    compass-canvas))
 
-;; render-compass : Number - Image
+;; render-compass : Number -> Image
+(: render-compass (Number -> Image))
 ;; Draws heading clockwise from north against the fixed compass face.
 (define (render-compass heading)
   (place-images
@@ -481,6 +495,7 @@
    altimeter-canvas))
 
 ;; render-altimeter : Number -> Image
+(: render-altimeter (Number -> Image))
 ;; Draws altitude in feet; one revolution represents 10,000 feet.
 (define (render-altimeter feet)
   (place-images
@@ -604,6 +619,7 @@
    airspeed-canvas))
 
 ;; render-airspeed : Number -> Image
+(: render-airspeed (Number -> Image))
 ;; Draws knots on the 0–400 scale; out-of-range readouts remain truthful.
 (define (render-airspeed knots)
   (place-images
@@ -729,6 +745,7 @@
    vertical-speed-canvas))
 
 ;; render-vspeed : Number -> Image
+(: render-vspeed (Number -> Image))
 ;; Draws feet/minute, positive for climb; the needle stops at +/-2,000.
 (define (render-vspeed feet-per-minute)
   (place-images
@@ -869,6 +886,7 @@
     (rectangle 400 200 "solid" horizon-ground-color))))
 
 ;; render-horizon : Number Number -> Image
+(: render-horizon (Number Number -> Image))
 ;; Draws pitch and right bank in degrees around a fixed aircraft symbol.
 ;; Pitch moves the landscape by 1.6 pixels/degree before bank rotation.
 ;; The visible pitch movement stops at +/-60; the readout retains the value.
@@ -910,6 +928,7 @@
 
 
 ;; compose-cockpit : Image Image Image Image Image Image -> Image
+(: compose-cockpit (Image Image Image Image Image Image -> Image))
 ;; Places instrument images in the original layout, applying display scales.
 (define (compose-cockpit throttle-image compass-image altimeter-image
                          airspeed-image vspeed-image horizon-image)
@@ -936,6 +955,90 @@
 ;; @COCKPIT-PREVIEW
 (define COCKPIT-PREVIEW
   (compose-cockpit throttle compass altimeter airspeed vertical-speed horizon))
+
+;; @EXECUTABLE INPUT/OUTPUT EXAMPLES
+;; Expected images use concrete positions, angles and text rather than calling
+;; the function under test to construct its own expected result.
+
+(check-expect (display-number 12.4) "12")
+(check-expect (display-number 12.6) "13")
+(check-expect (display-number -12.6) "-13")
+(check-expect (limit-to 0 100 -5) 0)
+(check-expect (limit-to 0 100 50) 50)
+(check-expect (limit-to 0 100 105) 100)
+(check-expect (heading-text 0) "000°")
+(check-expect (heading-text 45) "045°")
+(check-expect (heading-text 270) "270°")
+(check-expect (heading-text 359.6) "000°")
+(check-expect (heading-text -90) "270°")
+
+(define EXPECTED-IDLE-THROTTLE
+  (place-images
+   (list throttle-handle (text "0%" 12 throttle-detail-color))
+   (list (make-posn 80 185) (make-posn 60 205))
+   throttle-base))
+(check-expect (render-throttle 0) EXPECTED-IDLE-THROTTLE)
+
+(define EXPECTED-EAST-COMPASS
+  (place-images
+   (list compass-hub (rotate -90 compass-needle)
+         (text "090°" 12 compass-detail-color))
+   (list (make-posn 71 71) (make-posn 71 71) (make-posn 71 133))
+   compass-base))
+(check-expect (render-compass 90) EXPECTED-EAST-COMPASS)
+
+;; At 10,000 feet the needle returns to zero; the readout retains the altitude.
+(define EXPECTED-TEN-THOUSAND-FEET
+  (place-images
+   (list altimeter-hub altimeter-needle
+         (text "10000 FT" 10 altimeter-detail-color))
+   (list (make-posn 71 71) (make-posn 71 71) (make-posn 71 133))
+   altimeter-base))
+(check-expect (render-altimeter 10000) EXPECTED-TEN-THOUSAND-FEET)
+
+;; An overspeed needle stops at 400 knots, while its readout shows 500 knots.
+(define EXPECTED-OVERSPEED
+  (place-images
+   (list airspeed-hub (rotate -135 airspeed-needle)
+         (text "500 KT" 10 airspeed-detail-color))
+   (list (make-posn 71 71) (make-posn 71 71) (make-posn 71 133))
+   airspeed-base))
+(check-expect (render-airspeed 500) EXPECTED-OVERSPEED)
+
+;; A descent beyond the scale stops the needle at -2,000 feet/minute.
+(define EXPECTED-FAST-DESCENT
+  (place-images
+   (list vertical-speed-hub (rotate 240 vertical-speed-needle)
+         (text "-3000 FT/MIN" 8 vertical-speed-detail-color))
+   (list (make-posn 71 71) (make-posn 71 71) (make-posn 71 133))
+   vertical-speed-base))
+(check-expect (render-vspeed -3000) EXPECTED-FAST-DESCENT)
+
+;; Nose-up 10 degrees moves the landscape down 16 pixels in level bank.
+(define EXPECTED-NOSE-UP-HORIZON
+  (place-images
+   (list (text "PITCH 10°     ROLL 0°" 10 horizon-detail-color)
+         horizon-aircraft horizon-window-outline
+         (place-image horizon-landscape 74 74 horizon-window))
+   (list (make-posn 85 158) (make-posn 85 85)
+         (make-posn 85 85) (make-posn 85 85))
+   horizon-base))
+(check-expect (render-horizon 10 0) EXPECTED-NOSE-UP-HORIZON)
+
+;; Full-panel example verifies instrument placement and display scaling.
+(define EXPECTED-PREVIEW-LAYOUT
+  (place-images
+   (list WHEEL THROTTLE COMPASS ALTIMETER AIRSPEED VERTICAL-SPEED HORIZON
+         map-area cockpit)
+   (list (make-posn 480 490) (make-posn 290 440) (make-posn 650 450)
+         (make-posn 320 290) (make-posn 650 290) (make-posn 205 290)
+         (make-posn 480 290) (make-posn 835 415) (make-posn 480 270))
+   canvas))
+(check-expect
+ (compose-cockpit throttle compass altimeter airspeed vertical-speed horizon)
+ EXPECTED-PREVIEW-LAYOUT)
+
+;; Every function above is non-recursive; no termination arguments are needed.
 
 ;; Public drawing interface; individual artwork pieces remain internal.
 (provide render-throttle render-compass render-altimeter render-airspeed

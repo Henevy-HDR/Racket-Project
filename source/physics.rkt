@@ -6,8 +6,7 @@
 ; Author: Lorenzo Felix
 ; Purpose: contains the aircraft's physics calculations and updates
 ;          its state based on physical forces and elapsed time.
-; TODO: validate the physics model and test its integration. 
-
+; TODO: validate the physics model and test its integration.
 
 (require math)
 (require sludges)
