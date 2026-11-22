@@ -2,19 +2,36 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |Cockpit instruments|) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname test) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #t ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
-
-; Filename: Cockpit intruments.rkt
+; Filename: cockpit-instruments.rkt
 ; Date: 12 Nov
 ; Author: Leonida Ilijoska
 ; Purpose: graphical representation of the instruments and the cockpit.
-;          The parts are fixed, there is no movement.
-;TO DO: update the wheel and implement functions to each instrument.
+;          Fixed artwork and functions drawing instruments from live values.
+;TO DO: update the wheel.
 
 
 (require 2htdp/universe)
 (require 2htdp/image)
+
+;; display-number : Number -> String
+;; Rounds only the displayed text, preserving precision for needle movement.
+(define (display-number value)
+  (number->string (inexact->exact (round value))))
+
+;; limit-to : Number Number Number -> Number
+;; Limits a needle to the visible scale without changing its numeric readout.
+(define (limit-to low high value)
+  (max low (min high value)))
+
+;; heading-text : Number -> String
+;; Displays a rounded heading as three digits, wrapping 360 back to 000.
+(define (heading-text heading)
+  (local [(define degrees (modulo (inexact->exact (round heading)) 360))
+          (define digits (number->string degrees))]
+    (string-append (cond [( degrees 10) "00"]
+                         [(< degrees 100) "0"]
+                         [else ""])
+                   digits "°")))
 
 
 ;; @CANVAS
@@ -226,14 +243,18 @@
          (make-posn 60 205))    ;readout
    throttle-canvas))
 
-;example: the handle sits at 50%.
-;when making the function, use throttle-base and throttle-handle separately.
-;the handle stays at x = 100; its y goes from 195 (idle) to 50 (full).
-;render
-(define throttle
-  (place-images (list throttle-handle (text "50%" 12 throttle-detail-color))
-                (list (make-posn 80 110) (make-posn 60 205))
+;; render-throttle : Number -> Image
+;; Draws engine power in percent; the handle follows the labelled ticks.
+(define (render-throttle percentage)
+  (place-images (list throttle-handle
+                      (text (string-append (display-number percentage) "%")
+                            12 throttle-detail-color))
+                (list (make-posn 80 (- 185 (* 1.45 (limit-to 0 100 percentage))))
+                      (make-posn 60 205))
                 throttle-base))
+
+;example: the handle sits at 50%.
+(define throttle (render-throttle 50))
 
 
 
@@ -335,17 +356,20 @@
          (make-posn 71 133))  ;readout
    compass-canvas))
 
-;example: northeast, 045 degrees
-;render
-(define compass
+;; render-compass : Number - Image
+;; Draws heading clockwise from north against the fixed compass face.
+(define (render-compass heading)
   (place-images
    (list compass-hub
-         (rotate -45 compass-needle)
-         (text "045°" 12 compass-detail-color))
+         (rotate (- heading) compass-needle)
+         (text (heading-text heading) 12 compass-detail-color))
    (list (make-posn 71 71)
          (make-posn 71 71)
          (make-posn 71 133))
    compass-base))
+
+;example: northeast, 045 degrees
+(define compass (render-compass 45))
 
 
 
@@ -405,7 +429,7 @@
 (define altimeter-base
   (place-images
    (list (text "ALTIMETER" 12 altimeter-detail-color)
-         ;(text "×1000 FT" 7 "lightsteelblue")
+         (text "×1000 FT" 7 "lightsteelblue")
          (text "0" 10 altimeter-detail-color)
          (text "1" 10 altimeter-detail-color)
          (text "2" 10 altimeter-detail-color)
@@ -429,7 +453,7 @@
          altimeter-dial
          altimeter-readout)
    (list (make-posn 71 10)    ;title
-         ;(make-posn 71 90)    ;units
+         (make-posn 71 90)    ;units
          ;numbers
          (make-posn 71 38)    ;0
          (make-posn 90 44)    ;1
@@ -456,17 +480,22 @@
          (make-posn 71 133))  ;readout
    altimeter-canvas))
 
-;example: 3,000 ft
-;render
-(define altimeter
+;; render-altimeter : Number -> Image
+;; Draws altitude in feet; one revolution represents 10,000 feet.
+(define (render-altimeter feet)
   (place-images
    (list altimeter-hub
-         (rotate -108 altimeter-needle)
-         (text "3,000 FT" 10 altimeter-detail-color))
+         (rotate (* -0.036 (- feet (* 10000 (floor (/ feet 10000)))))
+                 altimeter-needle)
+         (text (string-append (display-number feet) " FT")
+               10 altimeter-detail-color))
    (list (make-posn 71 71)
          (make-posn 71 71)
          (make-posn 71 133))
    altimeter-base))
+
+;example: 3,000 ft
+(define altimeter (render-altimeter 3000))
 
 
 
@@ -574,18 +603,21 @@
          (make-posn 71 133))  ;readout
    airspeed-canvas))
 
-;example: 250 KT
-;use airspeed-base and airspeed-needle separately when adding movement.
-;render
-(define airspeed
+;; render-airspeed : Number -> Image
+;; Draws knots on the 0–400 scale; out-of-range readouts remain truthful.
+(define (render-airspeed knots)
   (place-images
    (list airspeed-hub
-         (rotate -33.75 airspeed-needle)
-         (text "250 KT" 10 airspeed-detail-color))
+         (rotate (- 135 (* 0.675 (limit-to 0 400 knots))) airspeed-needle)
+         (text (string-append (display-number knots) " KT")
+               10 airspeed-detail-color))
    (list (make-posn 71 71)
          (make-posn 71 71)
          (make-posn 71 133))
    airspeed-base))
+
+;example: 250 KT
+(define airspeed (render-airspeed 250))
 
 
 
@@ -696,18 +728,22 @@
          (make-posn 71 133))  ;readout
    vertical-speed-canvas))
 
-;example: 0 FT/MIN
-;use vertical-speed-base and vertical-speed-needle separately when adding movement.
-;render
-(define vertical-speed
+;; render-vspeed : Number -> Image
+;; Draws feet/minute, positive for climb; the needle stops at +/-2,000.
+(define (render-vspeed feet-per-minute)
   (place-images
    (list vertical-speed-hub
-         (rotate 90 vertical-speed-needle)
-         (text "0 FT/MIN" 8 vertical-speed-detail-color))
+         (rotate (- 90 (* 0.075 (limit-to -2000 2000 feet-per-minute)))
+                 vertical-speed-needle)
+         (text (string-append (display-number feet-per-minute) " FT/MIN")
+               8 vertical-speed-detail-color))
    (list (make-posn 71 71)
          (make-posn 71 71)
          (make-posn 71 133))
    vertical-speed-base))
+
+;example: 0 FT/MIN
+(define vertical-speed (render-vspeed 0))
 
 
 
@@ -832,19 +868,31 @@
     (rectangle 400 200 "solid" horizon-sky-color)
     (rectangle 400 200 "solid" horizon-ground-color))))
 
-;example: level flight
-;render
-(define horizon
+;; render-horizon : Number Number -> Image
+;; Draws pitch and right bank in degrees around a fixed aircraft symbol.
+;; Pitch moves the landscape by 1.6 pixels/degree before bank rotation.
+;; The visible pitch movement stops at +/-60; the readout retains the value.
+(define (render-horizon pitch roll)
   (place-images
-   (list (text "PITCH 0°     ROLL 0°" 10 horizon-detail-color)
+   (list (text (string-append "PITCH " (display-number pitch)
+                             "°     ROLL " (display-number roll) "°")
+               10 horizon-detail-color)
          horizon-aircraft
          horizon-window-outline
-         (place-image horizon-landscape 74 58 horizon-window))
+         (place-image
+          (rotate roll
+                  (place-image horizon-landscape
+                               200 (+ 200 (* 1.6 (limit-to -60 60 pitch)))
+                               (rectangle 400 400 "solid" "transparent")))
+          74 58 horizon-window))
    (list (make-posn 85 158)
          (make-posn 85 85)
          (make-posn 85 85)
          (make-posn 85 85))
    horizon-base))
+
+;example: level flight
+(define horizon (render-horizon 0 0))
 
 ;; @MAP-AREA
 (define map-area (empty-scene 250 250))
@@ -861,15 +909,17 @@
 (define HORIZON (scale 1 horizon))
 
 
-;; @COCKPIT-PREVIEW
-(define COCKPIT-PREVIEW
+;; compose-cockpit : Image Image Image Image Image Image -> Image
+;; Places instrument images in the original layout, applying display scales.
+(define (compose-cockpit throttle-image compass-image altimeter-image
+                         airspeed-image vspeed-image horizon-image)
   (place-images (list WHEEL
-                      THROTTLE
-                      COMPASS
-                      ALTIMETER
-                      AIRSPEED
-                      VERTICAL-SPEED
-                      HORIZON
+                      (scale 0.8 throttle-image)
+                      (scale 0.7 compass-image)
+                      (scale 0.7 altimeter-image)
+                      (scale 0.7 airspeed-image)
+                      (scale 0.7 vspeed-image)
+                      horizon-image
                       map-area
                       cockpit)
                 (list (make-posn 480 490)    ;wheel
@@ -882,3 +932,11 @@
                       (make-posn 835 415)    ;map-area
                       (make-posn 480 270))   ;cockpit
                 canvas))
+
+;; @COCKPIT-PREVIEW
+(define COCKPIT-PREVIEW
+  (compose-cockpit throttle compass altimeter airspeed vertical-speed horizon))
+
+;; Public drawing interface; individual artwork pieces remain internal.
+(provide render-throttle render-compass render-altimeter render-airspeed
+         render-vspeed render-horizon compose-cockpit COCKPIT-PREVIEW)

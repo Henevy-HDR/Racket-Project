@@ -1,15 +1,19 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname model) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #t ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
 ; Filename: model.rkt
-; Date: 12 Nov
-; Author: Chad John Pete
-; Purpose: contains all the struct definitions and the program's
+; Date: 22.11.2026
+; Author: Lorenzo Felix
+; Purpose: contains all the struct definitions and the program's 
 ;          logic functions.
 ; TODO: comments and examples for the structs
 
 (require sludges)
 
-;; Use built-in Posn as Position (or define your own struct with typed fields)
+;; Local X (east) and Y (north) in metres; heading clockwise from north.
+;; An aircraft's position heading agrees with its aircraft heading.
 (define-struct Position
   ([x Number]
    [y Number]
@@ -55,6 +59,7 @@
 
 ; MODULE EXPORTS
 (provide Aircraft Position Degree Throttle FlightStatus WorldState InstrumentType Instrument)
+(provide make-Position Position? Position-x Position-y Position-heading)
 (provide make-aircraft aircraft?)
 (provide aircraft-position aircraft-altitude)
 (provide aircraft-airspeed aircraft-heading)
