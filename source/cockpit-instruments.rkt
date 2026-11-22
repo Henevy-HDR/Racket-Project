@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |Cockpit instruments|) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname cockpit-instruments) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ; Filename: cockpit-instruments.rkt
 ; Date: 12 Nov
@@ -10,7 +10,8 @@
 ;TO DO: update the wheel.
 
 
-
+; Edits by Lorenzo Felix
+; Added render functions and design recipe!
 
 (require 2htdp/universe)
 (require 2htdp/image)
@@ -893,7 +894,7 @@
 (define (render-horizon pitch roll)
   (place-images
    (list (text (string-append "PITCH " (display-number pitch)
-                             "°     ROLL " (display-number roll) "°")
+                              "°     ROLL " (display-number roll) "°")
                10 horizon-detail-color)
          horizon-aircraft
          horizon-window-outline
