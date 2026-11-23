@@ -782,8 +782,7 @@
 (define horizon-window-height 116)
 
 ;detail
-;tick
-(define horizon-pitch-tick
+;tick(define horizon-pitch-tick
   (rectangle 34 1 "solid" horizon-detail-color))
 
 ;parts

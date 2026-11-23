@@ -24,7 +24,7 @@
 ;; Pitch, roll and throttle stay fixed, so their instruments stay fixed too.
 ;; Airspeed, altitude, heading and vertical speed evolve through physics.
 (define DEMO-AIRCRAFT
-  (make-aircraft (make-Position 0 0 0) 1000 140 0 5 15 0 75))
+  (make-aircraft (make-Position 0 0 0) 1000 140 0 -1 5 0 100))
 
 ;; tick-cockpit : Aircraft -> Aircraft
 ;; Advances the same aircraft snapshot that the cockpit will display.
