@@ -7,7 +7,6 @@
 ; Author: Leonida Ilijoska
 ; Purpose: graphical representation of the instruments and the cockpit.
 ;          Fixed artwork and functions drawing instruments from live values.
-;TO DO: update the wheel.
 
 
 ; Edits by Lorenzo Felix
@@ -181,6 +180,17 @@
          (make-posn 10 50)
          (make-posn 190 50))
    wheel-canvas))
+
+(: render-yoke (Number -> Image))
+;; Rotates the yoke around its centre using the aircraft roll in degrees.
+;; Positive roll turns clockwise (right); negative roll turns left.
+;; Uses the existing artwork without modifying it or any aircraft state.
+(define (render-yoke roll)
+  (rotate (- roll) wheel))
+
+(check-expect (render-yoke 0) wheel)
+(check-expect (render-yoke 30) (rotate -30 wheel))
+(check-expect (render-yoke -30) (rotate 30 wheel))
 
 
 
@@ -843,7 +853,7 @@
 (define horizon-landscape
   (place-images
    (list (rectangle 400 2 "solid" horizon-detail-color)
-   
+
          horizon-pitch-tick
          (text "30" 9 horizon-detail-color)
          (text "30" 9 horizon-detail-color)
@@ -919,7 +929,7 @@
 
 
 ;; @SCALE INSTRUMENTS
-(define WHEEL (scale 1 wheel))
+(define WHEEL (render-yoke 0))
 (define THROTTLE (scale 0.8 throttle))
 (define COMPASS (scale 0.7 compass))
 (define ALTIMETER (scale 0.7 altimeter))
@@ -928,12 +938,12 @@
 (define HORIZON (scale 1 horizon))
 
 
-;; compose-cockpit : Image Image Image Image Image Image -> Image
-(: compose-cockpit (Image Image Image Image Image Image -> Image))
+;; compose-cockpit : Image Image Image Image Image Image Image -> Image
+(: compose-cockpit (Image Image Image Image Image Image Image -> Image))
 ;; Places instrument images in the original layout, applying display scales.
-(define (compose-cockpit throttle-image compass-image altimeter-image
+(define (compose-cockpit yoke-image throttle-image compass-image altimeter-image
                          airspeed-image vspeed-image horizon-image)
-  (place-images (list WHEEL
+  (place-images (list yoke-image
                       (scale 0.8 throttle-image)
                       (scale 0.7 compass-image)
                       (scale 0.7 altimeter-image)
@@ -955,7 +965,7 @@
 
 ;; @COCKPIT-PREVIEW
 (define COCKPIT-PREVIEW
-  (compose-cockpit throttle compass altimeter airspeed vertical-speed horizon))
+  (compose-cockpit WHEEL throttle compass altimeter airspeed vertical-speed horizon))
 
 ;; @EXECUTABLE INPUT/OUTPUT EXAMPLES
 ;; Expected images use concrete positions, angles and text rather than calling
@@ -1036,11 +1046,11 @@
          (make-posn 480 290) (make-posn 835 415) (make-posn 480 270))
    canvas))
 (check-expect
- (compose-cockpit throttle compass altimeter airspeed vertical-speed horizon)
+ (compose-cockpit WHEEL throttle compass altimeter airspeed vertical-speed horizon)
  EXPECTED-PREVIEW-LAYOUT)
 
 ;; Every function above is non-recursive; no termination arguments are needed.
 
 ;; Public drawing interface; individual artwork pieces remain internal.
-(provide render-throttle render-compass render-altimeter render-airspeed
+(provide render-yoke render-throttle render-compass render-altimeter render-airspeed
          render-vspeed render-horizon compose-cockpit COCKPIT-PREVIEW)

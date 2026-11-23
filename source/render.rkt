@@ -2,8 +2,8 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname render) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ; Filename: render.rkt
-; Date: 12 Nov
-; Author: Chad John Pete
+; Date: 12.11.2026
+; Author: Lorenzo Felix
 ; Purpose: imports model.rkt and only contains drawing
 ;          functions.
 
@@ -40,6 +40,7 @@
 ;; Physics retains SI units; only drawing converts to cockpit units.
 (define (render-cockpit plane)
   (compose-cockpit
+   (render-yoke (aircraft-roll plane))
    (render-throttle (aircraft-throttle plane))
    (render-compass (aircraft-heading plane))
    (render-altimeter (metres-to-feet (aircraft-altitude plane)))
@@ -61,7 +62,7 @@
 (define AIRCRAFT-DISPLAY-EXAMPLE
   (make-aircraft POSITION-EAST 3048 (/ 463 9) 90 5 15 (/ 127 25) 75))
 (define EXPECTED-COCKPIT-EXAMPLE
-  (compose-cockpit (render-throttle 75) (render-compass 90)
+  (compose-cockpit (render-yoke 15) (render-throttle 75) (render-compass 90)
                    (render-altimeter 10000) (render-airspeed 100)
                    (render-vspeed 1000) (render-horizon 5 15)))
 (check-expect (render-cockpit AIRCRAFT-DISPLAY-EXAMPLE)
