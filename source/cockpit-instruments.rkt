@@ -782,7 +782,8 @@
 (define horizon-window-height 116)
 
 ;detail
-;tick(define horizon-pitch-tick
+;tick
+(define horizon-pitch-tick
   (rectangle 34 1 "solid" horizon-detail-color))
 
 ;parts
@@ -842,7 +843,7 @@
 (define horizon-landscape
   (place-images
    (list (rectangle 400 2 "solid" horizon-detail-color)
-
+   
          horizon-pitch-tick
          (text "30" 9 horizon-detail-color)
          (text "30" 9 horizon-detail-color)
