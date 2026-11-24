@@ -19,7 +19,7 @@
 (: test-plane (Number Number Throttle -> Aircraft))
 ;; Creates an aircraft with the specified pitch, roll and throttle.
 (define (test-plane pitch roll throttle)
-  (make-aircraft (make-posn 0 0)
+  (make-aircraft (make-Position 0 0 0)
                  1000 140 0
                  pitch roll 0 throttle))
 
@@ -63,7 +63,7 @@
 
 ; e. Free fall
 (define STOPPED
-  (make-aircraft (make-posn 0 0)
+  (make-aircraft (make-Position 0 0 0)
                  1000 0 0 0 45 0 0))
 
 (define FALLING (step-aircraft STOPPED DT))
@@ -71,14 +71,14 @@
 ; f. Heading wraparound
 (define WRAP
   (simulate
-   (make-aircraft (make-posn 0 0)
+   (make-aircraft (make-Position 0 0 359)
                   1000 140 359 0 45 0 50)
    30 DT))
 
 ; g. Eastward flight
 (define EAST
   (simulate
-   (make-aircraft (make-posn 0 0)
+   (make-aircraft (make-Position 0 0 90)
                   1000 140 90 0 0 0 100)
    30 DT))
 
@@ -144,8 +144,8 @@
  360 0.001)
 
 (check-within
- (+ (posn-x (aircraft-position RIGHT))
-    (posn-x (aircraft-position LEFT)))
+ (+ (Position-x (aircraft-position RIGHT))
+    (Position-x (aircraft-position LEFT)))
  0 0.001)
 
 (check-within
@@ -196,12 +196,12 @@
 ; h. Coordinate system
 
 (check-within
- (posn-x (aircraft-position EAST))
- (posn-y (aircraft-position FULL))
+ (Position-x (aircraft-position EAST))
+ (Position-y (aircraft-position FULL))
  0.001)
 
 (check-within
- (posn-y (aircraft-position EAST))
+ (Position-y (aircraft-position EAST))
  0 0.001)
 
 
@@ -221,17 +221,20 @@
  0.05)
 
 (check-within
- (posn-y (aircraft-position COARSE))
- (posn-y (aircraft-position FINE))
+ (Position-y (aircraft-position COARSE))
+ (Position-y (aircraft-position FINE))
  0.1)
 
 
 ; j. Physical invariants
 
 (: valid-motion? (Aircraft -> Boolean))
-;; Checks basic velocity and heading constraints.
+;; Checks velocity, heading and Position consistency constraints.
 (define (valid-motion? plane)
   (and (>= (aircraft-airspeed plane) 0)
+       (Position? (aircraft-position plane))
+       (= (Position-heading (aircraft-position plane))
+          (aircraft-heading plane))
        (>= (aircraft-heading plane) 0)
        (< (aircraft-heading plane) 360)
        (<= (abs (aircraft-vspeed plane))

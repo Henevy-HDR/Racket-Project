@@ -98,7 +98,7 @@ This module performs ONLY physics calculations -- it should stay this way btw.
 
 ;; MEMO: 
 ;; An Aircraft is a
-;; (make-aircraft Posn Number Airspeed Number Number Number Number Throttle).
+;; (make-aircraft Position Number Airspeed Number Number Number Number Throttle).
 ;; position: local X (east) and Y (north), measured in metres.
 ;; altitude: height in metres.
 ;; airspeed: total air-relative speed, measured in m/s.
@@ -110,7 +110,7 @@ This module performs ONLY physics calculations -- it should stay this way btw.
 ;; Airspeed must be at least the absolute value of vspeed.
 
 (define INITIAL-AIRCRAFT
-  (make-aircraft (make-posn 0 0) 1000 140 0 0 0 0 50))
+  (make-aircraft (make-Position 0 0 0) 1000 140 0 0 0 0 50))
 ;; INITIAL-AIRCRAFT : Aircraft
 ;; Example airborne aircraft for tests and integration.
 
@@ -469,30 +469,35 @@ This module performs ONLY physics calculations -- it should stay this way btw.
 (check-within (update-heading 350 (/ pi 18) 2) 10 0.001)
 (check-within (update-heading 30 0 1) 30 0.001)
 
-(: update-position (Posn Number Number Number -> Posn))
+(: update-position (Position Number Number Number -> Position))
 ;; Updates local X (east) and Y (north) position in metres.
 ;; Heading is in degrees; horizontal speed is in m/s.
+;; Stores the supplied heading in the returned Position.
 
-(define-header (update-position (make-posn 0 0) 10 0 1)
-  (make-posn 0 10))
+(define-header (update-position (make-Position 0 0 0) 10 0 1)
+  (make-Position 0 10 0))
 (define-template (update-position position horizontal-speed heading dt)
-  (...posn-x...posn-y...horizontal-speed...heading...dt...))
+  (...Position-x...Position-y...horizontal-speed...heading...dt...))
 
 (define (update-position position horizontal-speed heading dt)
-  (make-posn
-   (+ (posn-x position)
+  (make-Position
+   (+ (Position-x position)
       (* horizontal-speed (sin (degrees-to-radians heading)) dt))
-   (+ (posn-y position)
-      (* horizontal-speed (cos (degrees-to-radians heading)) dt))))
+   (+ (Position-y position)
+      (* horizontal-speed (cos (degrees-to-radians heading)) dt))
+   heading))
 
-(check-within (posn-x (update-position (make-posn 0 0) 10 0 1))
+(check-within (Position-x (update-position (make-Position 0 0 0) 10 0 1))
               0 0.001)
-(check-within (posn-y (update-position (make-posn 0 0) 10 0 1))
+(check-within (Position-y (update-position (make-Position 0 0 0) 10 0 1))
               10 0.001)
-(check-within (posn-x (update-position (make-posn 0 0) 10 90 1))
+(check-within (Position-x (update-position (make-Position 0 0 0) 10 90 1))
               10 0.001)
-(check-within (posn-y (update-position (make-posn 0 0) 10 90 1))
+(check-within (Position-y (update-position (make-Position 0 0 0) 10 90 1))
               0 0.001)
+(check-expect
+ (Position-heading (update-position (make-Position 0 0 0) 10 90 1))
+ 90)
 
 
 ; 5. AIRCRAFT PHYSICS STEP
@@ -567,18 +572,18 @@ This module performs ONLY physics calculations -- it should stay this way btw.
               (aircraft-roll INITIAL-AIRCRAFT))
 (check-expect (aircraft-throttle (step-aircraft INITIAL-AIRCRAFT 0.1))
               (aircraft-throttle INITIAL-AIRCRAFT))
-(check-expect (> (posn-y (aircraft-position
+(check-expect (> (Position-y (aircraft-position
                          (step-aircraft INITIAL-AIRCRAFT 0.1))) 0)
               #true)
 (check-expect
  (< (aircraft-vspeed
      (step-aircraft
-      (make-aircraft (make-posn 0 0) 1000 0 0 0 0 0 0) 0.1)) 0)
+      (make-aircraft (make-Position 0 0 0) 1000 0 0 0 0 0 0) 0.1)) 0)
  #true)
 (check-expect
  (> (aircraft-heading
      (step-aircraft
-      (make-aircraft (make-posn 0 0) 1000 140 0 0 20 0 50) 0.1)) 0)
+      (make-aircraft (make-Position 0 0 0) 1000 140 0 0 20 0 50) 0.1)) 0)
  #true)
 
 
