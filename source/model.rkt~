@@ -17,7 +17,7 @@
 
 (define-struct degree-coordinate [(x Degree) (y Degree)])
 
-(define-type Degree (number-from-<to 0 360))
+(define-type Degree (number-from-<to -360 360))
 
 (define-type Throttle (integer-from-to 0 100))
 
