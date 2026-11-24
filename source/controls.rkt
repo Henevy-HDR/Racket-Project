@@ -33,10 +33,10 @@
 ;; CONTROL LIMITS AND STEPS
 ;; These are simplified simulator input limits, not aircraft specifications.
 ;;Changed to 180 to do barrel rolls and inverted flight (for fun).
-(define MIN-PITCH -180)
-(define MAX-PITCH 180)
-(define MIN-ROLL -180)
-(define MAX-ROLL 180)
+(define MIN-PITCH -90)
+(define MAX-PITCH 90)
+(define MIN-ROLL -90)
+(define MAX-ROLL 90)
 (define PITCH-STEP 1)
 (define ROLL-STEP 2)
 (define THROTTLE-STEP 5)
