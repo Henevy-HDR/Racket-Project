@@ -7,3 +7,7 @@
 ; Purpose: contains the main program logic, manages the world state,
 ;          and coordinates the physics engine with the simulation.
 ; TODO: implement event handlers, world updates, and integration.
+
+(require "model.rkt")
+
+(define INITIAL_POSITION (make-degree-coordinate 0 0))

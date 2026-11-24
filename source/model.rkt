@@ -1,6 +1,8 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname model) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
 ; Filename: model.rkt
 ; Date: 12 Nov
 ; Author: Chad John Pete
@@ -11,9 +13,17 @@
 (require sludges)
 
 ;; Use built-in Posn as Position (or define your own struct with typed fields)
-(define-type Position Posn)
+; x: positive east, negative west
+; y: positive north, negative south
+(define-struct position
+  ([x Number]
+   [y Number]
+   [heading Degree]))
 
-(define-type Degree (number-from-<to 0 360))
+(define-struct degree-coordinate [(x Degree) (y Degree)])
+; note: you must put longitude first, and latitude second
+
+(define-type Degree (number-from-<to -360 360))
 
 (define-type Throttle (integer-from-to 0 100))
 
@@ -56,3 +66,12 @@
 (provide aircraft-airspeed aircraft-heading)
 (provide aircraft-pitch aircraft-roll) 
 (provide aircraft-vspeed aircraft-throttle)
+(provide DegreeCoordinate
+         make-degree-coordinate
+         degree-coordinate?
+         degree-coordinate-x
+         degree-coordinate-y)
+(provide Position
+         make-position
+         position-x
+         position-y)
