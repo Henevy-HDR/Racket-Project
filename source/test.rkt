@@ -4,7 +4,7 @@
 
 ; Filename: physics-test.rkt
 ; Date: 12 Nov
-; Author: Chadus Johnenzo Petixo
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: advances an aircraft through physics ticks and checks
 ;          that its state changes as expected.
 

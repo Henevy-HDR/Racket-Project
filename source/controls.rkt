@@ -5,7 +5,7 @@
 ;; about the language level of this file in a form that our tools can easily process.
 
 ; Date: 23.11.2026
-; Author: Lorenzo Felix
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Filename: controls.rkt
 ; Purpose: converts keyboard input into aircraft pitch, roll and throttle settings, will drive the simulation in main, based on the instrumnets and physics. 
 ; TODO: Quit the sim implementation. 

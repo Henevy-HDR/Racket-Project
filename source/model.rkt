@@ -6,7 +6,7 @@
 
 ; Filename: model.rkt
 ; Date: 12 Nov
-; Author: Chad John Pete
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: contains all the struct definitions and the program's 
 ;          logic functions.
 ; TODO: comments and examples for the structs 

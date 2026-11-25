@@ -4,7 +4,7 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ; Filename: cockpit-instruments.rkt
 ; Date: 12 Nov
-; Author: Leonida Ilijoska
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: graphical representation of the instruments and the cockpit.
 ;          Fixed artwork and functions drawing instruments from live values.
 

@@ -3,7 +3,7 @@
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname physics) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ; Filename: physics.rkt
 ; Date: 12 Nov 2026
-; Author: Lorenzo Felix
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: contains the aircraft's physics calculations and updates
 ;          its state based on physical forces and elapsed time.
 ; TODO: validate the physics model and test its integration.

@@ -3,7 +3,7 @@
 #reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname render) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ; Filename: render.rkt
 ; Date: 12.11.2026
-; Author: Lorenzo Felix
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: imports model.rkt and only contains drawing
 ;          functions.
 

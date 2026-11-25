@@ -6,7 +6,7 @@
 
 ; Filename: main.rkt
 ; Date: 23.11.2026
-; Author: Lorenzo Felix
+; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: contains the main program logic, manages the world state,
 ;          and coordinates the physics engine with the simulation.
 ; TODO: implement event handlers, world updates, and integration.
