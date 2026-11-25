@@ -12,3 +12,6 @@ Leonida Ilijoska, Lorenzo Felix, Edoardo Fiorini, as of the 25 November 2026
 - Started a separate OpenStreetMap tile prototype that converts geographic coordinates and zoom to tile indices. The moving map, aircraft marker, and destination selection and arrival checks are pending. The tile prototype currently has a position accessor error.
 - Added design-recipe examples and tests for flight physics, controls, and cockpit rendering. The flight-physics suite passed all 94 checks. The control-limit test expectations still reflect the earlier pitch and roll limits. Cockpit and keyboard tests could not run in the command-line environment because Racket’s GUI failed to initialize.
 
+Developer notes:
+1) program requires Advanced Student Language.
+2) Sometimes DrRacket has an issue with the three lines that it adds at the top to add metadata, sometimes they do appear in the files and DrRacket cant run until they are removed and re added. currently it should work. 
