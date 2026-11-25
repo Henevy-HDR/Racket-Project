@@ -1,9 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname controls) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #t ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-
 ; Date: 23.11.2026
 ; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Filename: controls.rkt
@@ -101,6 +98,9 @@
      (set-throttle plane (- (aircraft-throttle plane) THROTTLE-STEP))]
     [(key=? key " ") (set-roll (set-pitch plane 0) 0)]
     [else plane]))
+
+
+;;NOTES: Some test do fail, it will be a later problem as I theorized that the failure reason is related towards low quality rounding
 
 ;; EXECUTABLE INPUT/OUTPUT EXAMPLES
 ;; Full Aircraft comparisons verify that fields outside each control are preserved.

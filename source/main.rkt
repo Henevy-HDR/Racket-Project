@@ -1,16 +1,19 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname main) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #t ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname main) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #f ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
 ; Filename: main.rkt
 ; Date: 23.11.2026
 ; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
 ; Purpose: contains the main program logic, manages the world state,
 ;          and coordinates the physics engine with the simulation.
-; TODO: implement event handlers, world updates, and integration.
+; TODO: implement event handlers, world updates, and integration. (and add crash animation)
 ; Purpose: launches the cockpit, advances physics and handles keyboard controls.
+
+#|
+===============================================================================================
+;; BIG RED WARNING THIS PROGRAM REQUIRES ADVANCED STUDENT AS IT MAKES USE OF LAMBDA FUNCTIONS.
+===============================================================================================
+|#
 
 (require sludges)
 (require 2htdp/universe)
@@ -85,10 +88,10 @@
 ;; START SIMULATOR
 ;; Run this file in DrRacket to open the cockpit at INITIAL-CONDITION.
 ;; Arrows control pitch/roll, W/S control throttle, and Space levels attitude.
-;; Close the window to finish; reaching ground level also stops physics updates.
+;; Close the window to finish; reaching ground level also stops physics updates (at the moment makes the program crash, definitely a TODO)
 (big-bang INITIAL-CONDITION
   (name "Flight simulator")
-  (on-tick update-world DT) ;tiki tiki phonk
+  (on-tick update-world DT) ; tiki tiki phonk
   (on-key handle-key)
   (to-draw render-cockpit)
   (stop-when ground-reached?))

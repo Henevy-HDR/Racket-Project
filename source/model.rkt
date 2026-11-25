@@ -1,9 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname model) (read-case-sensitive #t) (teachpacks ((lib "sludges.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #t ((lib "sludges.rkt" "teachpack" "htdp")) #f)))
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-
 ; Filename: model.rkt
 ; Date: 12 Nov
 ; Author: Leonida Ilioska, Edoardo Fiorini, Lorenzo Felix
